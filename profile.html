@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الملف الشخصي</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+            <h1><i class="fas fa-user-circle"></i> الملف الرقمي: <span id="profileName">جار التحميل...</span></h1>
+        </header>
+
+        <main>
+            <!-- قسم التحليل الذكي -->
+            <section class="form-section" id="aiAnalysisSection" style="border-left: 5px solid var(--warning-color);">
+                <h2><i class="fas fa-brain"></i> التحليل الذكي</h2>
+                <div id="profileSummary">
+                    <div id="mlAnalysisContainer" class="loading-analysis">
+                        <i class="fas fa-cog fa-spin"></i> جارٍ تحميل التحليل الذكي...
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم التصدير -->
+            <section class="form-section" style="border-left: 5px solid var(--primary-color);">
+                <h2><i class="fas fa-download"></i> تصدير الملف الشخصي</h2>
+                <div class="export-options" id="exportButtons">
+                    <!-- سيتم تعبئته بواسطة reports-module.js -->
+                </div>
+            </section>
+
+            <!-- تفاصيل الملف الشخصي -->
+            <div id="profileDetailsContainer">
+                <!-- سيتم ملؤها ديناميكيًا بـ JavaScript -->
+            </div>
+
+            <!-- قسم إضافة ملاحظات جديدة -->
+            <section class="form-section" style="border-left: 5px solid var(--secondary-color);">
+                <h2><i class="fas fa-plus-circle"></i> إضافة ملاحظة جديدة</h2>
+                <div class="input-group">
+                    <textarea id="newNote" rows="3" placeholder="اكتب ملاحظتك هنا..."></textarea>
+                </div>
+                <div class="form-actions" style="justify-content: flex-start;">
+                    <button id="addNoteBtn" class="btn-primary">
+                        <i class="fas fa-save"></i> إضافة الملاحظة
+                    </button>
+                </div>
+            </section>
+
+            <!-- عرض الملاحظات السابقة -->
+            <section class="form-section" id="notesSection">
+                <h2><i class="fas fa-sticky-note"></i> الملاحظات المسجلة</h2>
+                <div id="notesContainer">
+                    <!-- سيتم ملؤها ديناميكيًا -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>
+                <strong><i class="fas fa-exclamation-triangle"></i> ملاحظة:</strong> 
+                هذا الملف مخزن محليًا في متصفحك. البيانات ستختفي إذا مسحت ذاكرة التخزين.
+            </p>
+        </footer>
+    </div>
+
+    <!-- نافذة تأكيد الحذف -->
+    <div id="deleteProfileModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3><i class="fas fa-trash"></i> تأكيد حذف الملف</h3>
+            <p id="deleteProfileModalText">هل أنت متأكد من حذف هذا الملف الشخصي؟</p>
+            <div class="modal-actions">
+                <button id="confirmProfileDeleteBtn" class="btn-danger">نعم، احذف</button>
+                <button id="cancelProfileDeleteBtn" class="btn-secondary">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="profile.js"></script>
+    <script src="reports-module.js"></script>
+    <script src="ml-module.js"></script>
+    <script>
+        // تهيئة بعد تحميل جميع الملفات
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileId = getProfileIdFromURL();
+            
+            if (!profileId) {
+                document.body.innerHTML = '<div class="container"><h1>خطأ: لم يتم تحديد ملف شخصي.</h1><a href="index.html">العودة للرئيسية</a></div>';
+                return;
+            }
+            
+            // تهيئة وحدة التقارير
+            if (typeof ReportManager !== 'undefined') {
+                try {
+                    const reportManager = new ReportManager();
+                    if (reportManager.setupExportUI) {
+                        reportManager.setupExportUI('exportButtons');
+                    }
+                } catch (error) {
+                    console.error('❌ خطأ في تهيئة وحدة التقارير:', error);
+                }
+            }
+            
+            // تهيئة وحدة الذكاء الاصطناعي
+            if (typeof SimpleMLModule !== 'undefined') {
+                setTimeout(() => {
+                    try {
+                        const mlModule = new SimpleMLModule();
+                        if (mlModule.renderAnalysisUI) {
+                            mlModule.renderAnalysisUI(profileId, 'mlAnalysisContainer');
+                        }
+                    } catch (error) {
+                        console.error('❌ خطأ في تهيئة وحدة الذكاء الاصطناعي:', error);
+                        document.getElementById('mlAnalysisContainer').innerHTML = 
+                            '<p style="color: var(--text-secondary);">⚠️ تعذر تحميل التحليل الذكي</p>';
+                    }
+                }, 500);
+            }
+            
+            // إضافة زر حذف الملف إذا كان ProfileManager متاحًا
+            if (window.ProfileManager) {
+                const profile = ProfileManager.getProfile(profileId);
+                if (profile) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-danger';
+                    deleteBtn.style.marginTop = '20px';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف هذا الملف الشخصي';
+                    deleteBtn.onclick = function() {
+                        showDeleteProfileModal(profileId, profile.name);
+                    };
+                    
+                    const actionsDiv = document.querySelector('.form-actions');
+                    if (actionsDiv) {
+                        actionsDiv.appendChild(deleteBtn);
+                    }
+                }
+            }
+        });
+        
+        function getProfileIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        function showDeleteProfileModal(profileId, profileName) {
+            const modal = document.getElementById('deleteProfileModal');
+            const text = document.getElementById('deleteProfileModalText');
+            const confirmBtn = document.getElementById('confirmProfileDeleteBtn');
+            const cancelBtn = document.getElementById('cancelProfileDeleteBtn');
+            
+            if (!modal || !text) return;
+            
+            text.textContent = `هل أنت متأكد من حذف الملف الشخصي "${profileName}"؟ لا يمكن التراجع عن هذا الإجراء.`;
+            
+            modal.style.display = 'flex';
+            
+            confirmBtn.onclick = function() {
+                if (window.ProfileManager) {
+                    ProfileManager.deleteProfile(profileId);
+                    alert(`تم حذف الملف الشخصي "${profileName}" بنجاح`);
+                    window.location.href = 'index.html';
+                }
+            };
+            
+            cancelBtn.onclick = function() {
+                modal.style.display = 'none';
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة ملف شخصي جديد</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+            <h1><i class="fas fa-user-plus"></i> إضافة ملف شخصي جديد</h1>
+            <p class="subtitle">املأ النموذج أدناه لإضافة ملف شخصي جديد إلى النظام</p>
+        </header>
+
+        <main>
+            <form id="addProfileForm" class="profile-form">
+                <!-- البيانات التعريفية -->
+                <section class="form-section">
+                    <h2><i class="fas fa-id-card"></i> البيانات التعريفية</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="name">الاسم الكامل *</label>
+                            <input type="text" id="name" required placeholder="أحمد محمد">
+                        </div>
+                        <div class="input-group">
+                            <label for="age">العمر</label>
+                            <input type="number" id="age" min="1" max="120" placeholder="25">
+                        </div>
+                        <div class="input-group">
+                            <label for="country">الدولة</label>
+                            <select id="country">
+                                <option value="">اختر الدولة</option>
+                                <option value="السعودية">السعودية</option>
+                                <option value="مصر">مصر</option>
+                                <option value="الامارات">الإمارات</option>
+                                <option value="الأردن">الأردن</option>
+                                <option value="الكويت">الكويت</option>
+                                <option value="البحرين">البحرين</option>
+                                <option value="عمان">عُمان</option>
+                                <option value="قطر">قطر</option>
+                                <option value="اليمن">اليمن</option>
+                                <option value="العراق">العراق</option>
+                                <option value="سوريا">سوريا</option>
+                                <option value="لبنان">لبنان</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="city">المدينة</label>
+                            <input type="text" id="city" placeholder="الرياض">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- بيانات الاتصال -->
+                <section class="form-section">
+                    <h2><i class="fas fa-address-book"></i> بيانات الاتصال</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="email">البريد الإلكتروني</label>
+                            <input type="email" id="email" placeholder="example@domain.com">
+                        </div>
+                        <div class="input-group">
+                            <label for="phone">رقم الهاتف</label>
+                            <input type="tel" id="phone" placeholder="+966501234567">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- البيانات الرقمية -->
+                <section class="form-section">
+                    <h2><i class="fas fa-link"></i> الروابط والحسابات</h2>
+                    <p class="section-subtitle">(انسخ الروابط كاملة مثل https://www.example.com)</p>
+                    <div id="linksContainer">
+                        <div class="link-input-group">
+                            <input type="url" class="link-input" placeholder="https://www.facebook.com/username">
+                            <button type="button" class="btn-icon remove-link" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" id="addLinkBtn" class="btn-secondary">
+                        <i class="fas fa-plus"></i> إضافة رابط آخر
+                    </button>
+                </section>
+
+                <!-- البيانات التقنية -->
+                <section class="form-section">
+                    <h2><i class="fas fa-laptop-code"></i> البيانات التقنية</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="ip">عنوان IP</label>
+                            <input type="text" id="ip" placeholder="192.168.1.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="device">نوع الجهاز</label>
+                            <input type="text" id="device" placeholder="iPhone 13, Samsung Galaxy">
+                        </div>
+                        <div class="input-group">
+                            <label for="browser">المتصفح</label>
+                            <input type="text" id="browser" placeholder="Chrome, Firefox, Safari">
+                        </div>
+                        <div class="input-group">
+                            <label for="os">نظام التشغيل</label>
+                            <input type="text" id="os" placeholder="Windows 11, iOS 16, Android">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- البيانات السلوكية -->
+                <section class="form-section">
+                    <h2><i class="fas fa-chart-line"></i> البيانات السلوكية</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="interests">الاهتمامات</label>
+                            <textarea id="interests" rows="2" placeholder="برمجة، قراءة، سفر، رياضة..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="activeTime">الوقت النشط</label>
+                            <select id="activeTime">
+                                <option value="">اختر الوقت النشط</option>
+                                <option value="صباحاً (6 ص - 12 م)">صباحاً (6 ص - 12 م)</option>
+                                <option value="ظهراً (12 م - 4 م)">ظهراً (12 م - 4 م)</option>
+                                <option value="مساءً (4 م - 8 م)">مساءً (4 م - 8 م)</option>
+                                <option value="ليل (8 م - 12 ص)">ليل (8 م - 12 ص)</option>
+                                <option value="فجر (12 ص - 6 ص)">فجر (12 ص - 6 ص)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- الملاحظات -->
+                <section class="form-section">
+                    <h2><i class="fas fa-sticky-note"></i> ملاحظات خاصة</h2>
+                    <div class="input-group">
+                        <textarea id="notes" rows="4" placeholder="اكتب هنا أي ملاحظات إضافية تريد تدوينها..."></textarea>
+                    </div>
+                </section>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> حفظ الملف الشخصي
+                    </button>
+                    <button type="reset" class="btn-secondary">
+                        <i class="fas fa-undo"></i> مسح النموذج
+                    </button>
+                    <a href="index.html" class="btn-secondary">
+                        <i class="fas fa-times"></i> إلغاء
+                    </a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // منطق إضافة/إزالة حقول الروابط الديناميكية
+        document.addEventListener('DOMContentLoaded', function() {
+            const linksContainer = document.getElementById('linksContainer');
+            const addLinkBtn = document.getElementById('addLinkBtn');
+
+            function addLinkField(value = '') {
+                const linkGroup = document.createElement('div');
+                linkGroup.className = 'link-input-group';
+                linkGroup.innerHTML = `
+                    <input type="url" class="link-input" placeholder="https://www.example.com" value="${value}">
+                    <button type="button" class="btn-icon remove-link">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                linksContainer.appendChild(linkGroup);
+                
+                // إضافة مستمع حدث للزر الجديد
+                linkGroup.querySelector('.remove-link').addEventListener('click', function() {
+                    if (document.querySelectorAll('.link-input-group').length > 1) {
+                        linkGroup.remove();
+                    }
+                });
+                
+                // عرض زر الإزالة إذا كان هناك أكثر من حقل
+                document.querySelectorAll('.remove-link').forEach(btn => {
+                    btn.style.display = document.querySelectorAll('.link-input-group').length > 1 ? 'block' : 'none';
+                });
+            }
+
+            addLinkBtn.addEventListener('click', function() {
+                addLinkField();
+            });
+
+            // إضافة أول حقل
+            addLinkField();
+        });
+    </script>
+</body>
+</html>

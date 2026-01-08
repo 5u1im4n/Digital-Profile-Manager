@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير الملفات الرقمية</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-user-secret"></i> مدير الملفات الرقمية</h1>
+            <p class="subtitle">مشروع تعليمي لإدارة وتنظيم البيانات الرقمية</p>
+        </header>
+
+        <main>
+            <!-- شريط البحث والإضافة -->
+            <div class="actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="ابحث عن شخص بالاسم...">
+                </div>
+                <div class="view-controls">
+                    <button class="view-btn active" data-view="grid" title="عرض شبكة">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="view-btn" data-view="list" title="عرض قائمة">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+                <a href="add.html" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> إضافة شخص جديد
+                </a>
+            </div>
+
+            <!-- قسم الإحصائيات -->
+            <div class="stats-bar">
+                <div class="stat">
+                    <i class="fas fa-users"></i>
+                    <span id="totalProfiles">0</span> ملف
+                </div>
+                <div class="stat">
+                    <i class="fas fa-shield-alt"></i>
+                    <span id="lowRisk">0</span> منخفض
+                </div>
+                <div class="stat">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="highRisk">0</span> مرتفع
+                </div>
+                <div class="stat">
+                    <i class="fas fa-globe"></i>
+                    <span id="countriesCount">0</span> دولة
+                </div>
+            </div>
+
+            <!-- قائمة الأشخاص المحفوظين -->
+            <section class="profiles-section">
+                <h2><i class="fas fa-users"></i> الأشخاص المضافون</h2>
+                <div id="profilesContainer" class="profiles-grid">
+                    <!-- هنا تُعرض البطاقات ديناميكيًا عبر JavaScript -->
+                </div>
+                <p id="noProfilesMessage" class="empty-message" style="display: none;">
+                    لم يتم إضافة أي أشخاص بعد. <a href="add.html">ابدأ بإضافة ملف شخصي جديد</a>.
+                </p>
+            </section>
+        </main>
+
+        <footer>
+            <p>
+                <strong><i class="fas fa-exclamation-triangle"></i> ملاحظة مهمة:</strong> 
+                هذا مشروع تعليمي مصمم لفهم تقنيات الويب وتنظيم البيانات. 
+                يخزن البيانات محليًا في متصفحك فقط. الاستخدام مسؤوليتك.
+            </p>
+            <p class="footer-links">
+                <a href="#" id="exportAllData"><i class="fas fa-download"></i> تصدير جميع البيانات</a> | 
+                <a href="#" id="showStats"><i class="fas fa-chart-bar"></i> عرض الإحصائيات</a> | 
+                <a href="#" id="clearData"><i class="fas fa-trash"></i> مسح جميع البيانات</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- نافذة تأكيد الحذف -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3><i class="fas fa-trash"></i> تأكيد الحذف</h3>
+            <p id="deleteModalText">هل أنت متأكد من الحذف؟</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn-danger">نعم، احذف</button>
+                <button id="cancelDeleteBtn" class="btn-secondary">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الإحصائيات -->
+    <div id="statsModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3><i class="fas fa-chart-bar"></i> إحصائيات النظام</h3>
+            <div id="statsContent" class="stats-content"></div>
+            <div class="modal-actions">
+                <button id="closeStatsBtn" class="btn-secondary">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="reports-module.js"></script>
+    <script>
+        // تهيئة إضافية للصفحة الرئيسية
+        document.addEventListener('DOMContentLoaded', function() {
+            // تحديث الإحصائيات
+            updateStats();
+            
+            // أحداث الأزرار
+            document.getElementById('exportAllData')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.ReportManager) {
+                    const rm = new ReportManager();
+                    rm.exportAllProfiles('csv');
+                } else {
+                    alert('وحدة التقارير غير متوفرة');
+                }
+            });
+            
+            document.getElementById('showStats')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showStatsModal();
+            });
+            
+            document.getElementById('clearData')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('⚠️ هل أنت متأكد من مسح جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+                    localStorage.clear();
+                    alert('تم مسح جميع البيانات بنجاح');
+                    location.reload();
+                }
+            });
+            
+            // أحداث أزرار العرض
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const viewMode = this.getAttribute('data-view');
+                    if (window.toggleViewMode) {
+                        toggleViewMode(viewMode);
+                    }
+                });
+            });
+        });
+        
+        function updateStats() {
+            if (window.ProfileManager) {
+                const stats = ProfileManager.getStats();
+                document.getElementById('totalProfiles').textContent = stats.total;
+                document.getElementById('lowRisk').textContent = stats.byRiskLevel.low;
+                document.getElementById('highRisk').textContent = stats.byRiskLevel.high;
+                document.getElementById('countriesCount').textContent = Object.keys(stats.byCountry).length;
+            }
+        }
+        
+        function showStatsModal() {
+            if (!window.ProfileManager) return;
+            
+            const stats = ProfileManager.getStats();
+            const statsContent = document.getElementById('statsContent');
+            const modal = document.getElementById('statsModal');
+            
+            let html = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total}</div>
+                        <div class="stat-label">إجمالي الملفات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.withEmail}</div>
+                        <div class="stat-label">بها بريد إلكتروني</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.withPhone}</div>
+                        <div class="stat-label">بها رقم هاتف</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.withNotes}</div>
+                        <div class="stat-label">بها ملاحظات</div>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <h4><i class="fas fa-shield-alt"></i> توزيع مستويات المخاطرة</h4>
+                    <div class="risk-distribution">
+                        <div class="risk-bar low" style="width: ${(stats.byRiskLevel.low / stats.total * 100) || 0}%">
+                            <span>منخفض: ${stats.byRiskLevel.low}</span>
+                        </div>
+                        <div class="risk-bar medium" style="width: ${(stats.byRiskLevel.medium / stats.total * 100) || 0}%">
+                            <span>متوسط: ${stats.byRiskLevel.medium}</span>
+                        </div>
+                        <div class="risk-bar high" style="width: ${(stats.byRiskLevel.high / stats.total * 100) || 0}%">
+                            <span>مرتفع: ${stats.byRiskLevel.high}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (Object.keys(stats.byCountry).length > 0) {
+                html += `
+                    <div class="stats-section">
+                        <h4><i class="fas fa-globe"></i> توزيع البلدان</h4>
+                        <div class="countries-list">
+                            ${Object.entries(stats.byCountry).map(([country, count]) => `
+                                <div class="country-item">
+                                    <span class="country-name">${country || 'غير محدد'}</span>
+                                    <span class="country-count">${count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            statsContent.innerHTML = html;
+            modal.style.display = 'flex';
+            
+            document.getElementById('closeStatsBtn').onclick = function() {
+                modal.style.display = 'none';
+            };
+        }
+    </script>
+</body>
+</html>
